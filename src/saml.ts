@@ -27,6 +27,7 @@ import {
   XMLObject,
   XMLValue,
   SamlResponseXmlJs,
+  SamlResponseXmlJs2,
 } from "./types";
 import { AuthenticateOptions, AuthorizeOptions } from "./passport-saml-types";
 import { assertBooleanIfPresent, assertRequired } from "./utility";
@@ -97,6 +98,9 @@ class SAML {
       host: ctorOptions.host ?? "localhost",
       issuer: ctorOptions.issuer,
       audience: ctorOptions.audience ?? ctorOptions.issuer ?? "unknown_audience", // use issuer as default
+      // KIMIZUKA追加
+      destination: ctorOptions.destination ?? false,
+      // KIMIZUKA追加
       identifierFormat:
         ctorOptions.identifierFormat === undefined
           ? "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
@@ -969,8 +973,14 @@ class SAML {
     const nowMs = new Date().getTime();
     const profile = {} as Profile;
     const doc: XMLOutput = await parseXml2JsFromString(xml);
+    // KIMIZUKA追加
+    const samlResponseDoc: XMLOutput = await parseXml2JsFromString(samlResponseXml);
+    // KIMIZUKA追加
     const parsedAssertion: XMLOutput = doc;
     const assertion: XMLOutput = doc.Assertion;
+    // KIMIZUKA追加
+    const samlResponse: SamlResponseXmlJs2 = samlResponseDoc.Response;
+    // KIMIZUKA追加
     getInResponseTo: {
       const issuer = assertion.Issuer;
       if (issuer && issuer[0]._) {
@@ -1100,6 +1110,16 @@ class SAML {
       if (audienceErr) throw audienceErr;
     }
 
+    // KIMIZUKA追加
+    if (this.options.destination !== false) {
+      const destinationErr = this.checkDestinationValidityError(
+        this.options.destination,
+        samlResponse.Response.$.Destination,
+      );
+      if (destinationErr) throw destinationErr;
+    }
+    // KIMIZUKA追加
+
     const attributeStatement = assertion.AttributeStatement;
     if (attributeStatement) {
       const attributes: XMLOutput[] = [].concat(
@@ -1218,6 +1238,28 @@ class SAML {
     }
     return null;
   }
+
+  // KIMIZUKA追加
+  protected checkDestinationValidityError(
+    expectedDestination: string,
+    receivedDestination: string,
+  ): Error | null {
+    // SAMLresponseにDestinationが無い
+    if (!receivedDestination) {
+      return new Error("SAML response has no Destination");
+    }
+    // congigとresponseのDestinationが一致しない
+    if (expectedDestination !== receivedDestination) {
+      return new Error(
+        "SAML response Destination mismatch. Expected: " +
+          expectedDestination +
+          " Received: " +
+          receivedDestination,
+      );
+    }
+    return null;
+  }
+  // KIMIZUKA追加
 
   async validatePostRequestAsync(
     container: Record<string, string>
