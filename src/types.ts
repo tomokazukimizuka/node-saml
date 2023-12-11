@@ -74,6 +74,27 @@ export type SamlStatusXmlJs = {
   ];
 };
 
+// KIMIZUKA追加
+export type SamlResponseXmlJs2 = XmlJsObject & {
+  Response: {
+    $: {
+      ["xmlns:samlp"]: string;
+      ID: string;
+      InResponseTo: string;
+      Version: string;
+      IssueInstant: string;
+      Destination: string;
+      Issuer: unknown;
+      Signature: unknown;
+      Status: unknown;
+      Assertion: unknown;
+    };
+  };
+
+  destination: string | false;
+};
+// KIMIZUKA追加
+
 export type CertCallback = (
   callback: (err: Error | null, cert?: string | string[]) => void,
 ) => void;
@@ -163,6 +184,9 @@ export interface SamlOptions extends Partial<SamlSigningOptions>, MandatorySamlO
   passive: boolean;
   idpIssuer?: string;
   audience: string | false;
+  // KIMIZUKA追加
+  destination: string | false;
+  // KIMIZUKA追加
   scoping?: SamlScopingConfig;
   wantAssertionsSigned: boolean;
   wantAuthnResponseSigned: boolean;
