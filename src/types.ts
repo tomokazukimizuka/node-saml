@@ -67,22 +67,18 @@ export type SamlStatusXmlJs = {
 };
 // KIMIZUKA追加
 export type SamlResponseXmlJs2 = XmlJsObject & {
-  Response: {
-    $: {
-      ["xmlns:samlp"]: string;
-      ID: string;
-      InResponseTo: string;
-      Version: string;
-      IssueInstant: string;
-      Destination: string;
-      Issuer: unknown;
-      Signature: unknown;
-      Status: unknown;
-      Assertion: unknown;
-    };
+  $: {
+    ["xmlns:samlp"]: string;
+    ID: string;
+    InResponseTo: string;
+    Version: string;
+    IssueInstant: string;
+    Destination: string;
+    Issuer: unknown;
+    Signature: unknown;
+    Status: unknown;
+    Assertion: unknown;
   };
-
-  destination: string | false;
 };
 // KIMIZUKA追加
 

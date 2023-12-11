@@ -1114,7 +1114,7 @@ class SAML {
     if (this.options.destination !== false) {
       const destinationErr = this.checkDestinationValidityError(
         this.options.destination,
-        samlResponse.Response.$.Destination,
+        samlResponse.$.Destination,
       );
       if (destinationErr) throw destinationErr;
     }
