@@ -1277,7 +1277,7 @@ class SAML {
     //congigとresponseのDestinationが一致しない
     if (expectedDestination !== receivedDestination) {
       return new Error(
-        "SAML response audience mismatch. Expected: " +
+        "SAML response Destination mismatch. Expected: " +
           expectedDestination +
           " Received: " +
           receivedDestination,
